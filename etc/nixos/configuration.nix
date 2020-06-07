@@ -1,4 +1,3 @@
-
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
@@ -8,18 +7,23 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      <nixos-hardware/lenovo/thinkpad/x1/6th-gen/QHD>
       ./hardware-configuration.nix
+      # NixOS Hardware tweaks for x1
+      <nixos-hardware/lenovo/thinkpad/x1/6th-gen>
     ];
 
   # Use the systemd-boot EFI boot loader.
-  boot = {
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "lambda"; # Define your hostname.
-  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
+  # Per-interface useDHCP will be mandatory in the future, so this generated config
+  # replicates the default behaviour.
+  networking.useDHCP = false;
+  networking.interfaces.wlp2s0.useDHCP = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -27,10 +31,11 @@
 
   # Select internationalisation properties.
   i18n = {
-    consoleFont = "Lat2-Terminus16";
-    consoleKeyMap = "us";
     defaultLocale = "en_US.UTF-8";
   };
+
+  console.keyMap = "us";
+  console.font   = "ter-232n";
 
   # Set your time zone.
   time.timeZone = "Europe/Bucharest";
@@ -38,37 +43,14 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget
-    vim emacs
-    git
-    powertop
-    opam
-    firefox
-    google-chrome
-    chromium
-    qutebrowser
-    jdk
-    binutils
-    acpi
-    stdenv
-    compton
-    stack
-    ghc
-    wget
-    htop
-    tmux
-    dmenu
-    scrot
-    xscreensaver
-    stalonetray
-    feh
-    rxvt_unicode-with-plugins
-    pywal
-    slack
-    skypeforlinux
-
-    texlive.combined.scheme-full
-
+    wget vim emacs git binutils acpi stdenv zlib unzip ispell jq
+    jdk12 opam cabal-install cabal2nix nix-prefetch-git
+    coq coqPackages.mathcomp
+    ghc stack haskellPackages.Agda
+    htop tmux powertop psmisc
+    firefox google-chrome qutebrowser transmission mpv-with-scripts vlc spotify
+    slack skypeforlinux discord libreoffice
+    gnome3.gnome-tweak-tool ntfs3g fuse-common appimage-run exfat exfat-utils
     nix-index
   ];
 
@@ -102,48 +84,18 @@
   services.xserver = {
     enable = true;
     layout = "us";
+    xkbOptions = "ctrl:nocaps";
 
-    # Remap caps.
-    xkbOptions = "ctrl:swapcaps";
+    # Enable touchpad support
+    libinput.enable = true;
 
-    # Display manager.
-    displayManager.slim = {
-      defaultUser = "roa";
-      autoLogin   = true;
-      theme = pkgs.fetchurl {
-      	url    = "https://github.com/jagajaga/nixos-slim-theme/archive/Final.tar.gz";
-        sha256 = "4cab5987a7f1ad3cc463780d9f1ee3fbf43603105e6a6e538e4c2147bde3ee6b";
-      };
-    };
-    
-    # Enable touchpad support.
-    libinput = {
-      enable = true;
-      tapping = true;
-      disableWhileTyping = true;
-      naturalScrolling = true;
-      additionalOptions = ''
-        Option "AccelSpeed" "1"
-      '';
-    };
-
-    windowManager.xmonad = {
-      enable = true;
-      enableContribAndExtras = true;
-      extraPackages = haskellPackages: [
-        haskellPackages.xmonad-contrib
-	haskellPackages.xmonad-extras
-	haskellPackages.xmonad
-	haskellPackages.xmobar
-      ];
-    };
+    # Enable Desktop Environments
+    displayManager.gdm.enable = true;
+    desktopManager.gnome3.enable = true;
   };
 
-  # Enable the KDE Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
+
   users.users.roa = {
     isNormalUser = true;
     home = "/home/roa";
@@ -156,51 +108,21 @@
   # compatible, in order to avoid breaking some software such as database
   # servers. You should change this only after NixOS release notes say you
   # should.
-  system.stateVersion = "18.09"; # Did you read the comment?
+  system.stateVersion = "19.09"; # Did you read the comment?
 
   nixpkgs.config.allowUnfree = true;
 
-  fonts = {
-    fonts = with pkgs; [
-      corefonts
-      ubuntu_font_family
-      terminus_font
-      terminus_font_ttf
-      fira-code
-      fira-code-symbols
-      fira-mono
-      source-code-pro
-      hasklig
-      hack-font
-      inconsolata
-    ];
-  };
-
-  powerManagement.enable = true;
-  services.dbus.enable = true;
-  services.tlp.enable = true;
-  services.upower.enable = true;
   services.fprintd.enable = true;
   services.fwupd.enable = true;
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableAllFirmware = true;
-#  hardware.bluetooth.enable = true;
-  hardware.trackpoint = {
-    enable = true;
-    sensitivity = 255;
-    speed = 200;
-    emulateWheel = true;
-  };
+  hardware.bluetooth.enable = true;
 
-  programs.light.enable = true;
-  services.udev = {
-    extraRules = ''
-      ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="intel_backlight", RUN+="${pkgs.coreutils}/bin/chgrp wheel /sys/class/backlight/%k/brightness"
-      ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="intel_backlight", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/backlight/%k/brightness"
-    '';
+  nix = {
+    binaryCaches          = [ "https://hydra.iohk.io" "https://iohk.cachix.org" ];
+    binaryCachePublicKeys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo=" ];
   };
-
-  
 
 }
+
