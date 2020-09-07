@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =5
+let g:netrw_dirhist_5='/Users/roa/.vim'
+let g:netrw_dirhist_4='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language/UntypedPlutusCore/Core'
+let g:netrw_dirhist_3='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language/UntypedPlutusCore'
+let g:netrw_dirhist_2='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language'
+let g:netrw_dirhist_1='/Users/roa/Spaces/iohk/plutus/plutus-core/src/Language/PlutusCore/Universe'
+let g:netrw_dirhist_0='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language/UntypedPlutusCore/Core'
+let g:netrw_dirhist_9='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language/UntypedPlutusCore'
+let g:netrw_dirhist_8='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language'
+let g:netrw_dirhist_7='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core'
+let g:netrw_dirhist_6='/Users/roa/Spaces/iohk/plutus/plutus-core/untyped-plutus-core/Language/UntypedPlutusCore'
