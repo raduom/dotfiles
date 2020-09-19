@@ -137,7 +137,7 @@ inoremap jj <ESC>
 set pastetoggle=<F2>
 
 " GUI settings
-set guifont=Menlo-Regular:h16
+set guifont=SourceCodePro-Regular:h16
 colorscheme darcula
 
 " Coc setup
